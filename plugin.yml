@@ -1,0 +1,23 @@
+name: PMcleaner
+main: PMCleaner\Main
+version: 1.0.0
+api: [2.0.0]
+load: STARTUP
+author: dhdj
+commands:
+ clean:
+  permission: PMCleaner.command.clean
+  description: PM清理插件主命令
+  usage: /clean <clean|reload>
+permissions:
+ FCleaner.*:
+  default: op
+  description: OP权限
+  children:
+  FCleaner.command:
+   default: op
+   description: 所有权限
+   children:
+    FCleaner.command.clean:
+     default: op
+     description: 清理掉落物指令
