@@ -1,6 +1,6 @@
 <?php
 namespace PMCleaner;
-
+//调用PM核心模块，应该支持0.12以后的版本
 use pocketmine\event\server\ServerCommandEvent;
 use pocketmine\event\level\LevelEvent;
 use pocketmine\scheduler\CallbackTask;
@@ -19,9 +19,9 @@ use pocketmine\entity\Human;
 use pocketmine\utils\Config;
 use pocketmine\level\Level;
 use pocketmine\utils\Utils;
-use pocketmine\Server;
 use pocketmine\Player;
-
+use pocketmine\Server;
+//创建配置文件和默认配置
 class Main extends PluginBase implements Listener
 {
 	public function onEnable()
@@ -50,7 +50,7 @@ class Main extends PluginBase implements Listener
 			$this->clean();
 			break;
 		case "reload":
-			$this->cfg->reload();
+			$this->cfg->reload();//重启插件命令
 			if(!$this->cfg->exists("CleanDelay"))
 			{
 				$this->cfg->set("CleanDelay","300");
@@ -72,16 +72,26 @@ class Main extends PluginBase implements Listener
     public function clean(){
         $i = 0;
         foreach($this->getServer()->getLevels() as $level){
-            foreach($level->getEntities() as $entity){
+            foreach($level->getEntities() as $entity){//清理掉落物模块
                 if(!$this->isEntityExempted($entity) && !($entity instanceof Creature)){
                     $entity->close();
                     $i++;
                 }
             }
         }
-Server::getInstance()->broadcastMessage("[ PMcleaner ] 共清理{$i}个掉落物");
+Server::getInstance()->broadcastMessage("[ PMcleaner ] 共清理{$i}个掉落物，清理内存完成！");
       unset($i,$entity);
     }
+	public function onTimer()
+    {//内存清理模块
+		foreach($this->getServer()->getLevels() as $level){
+			$level->doChunkGarbageCollection();
+			$level->unloadChunks(\true);
+			$level->clearCache(\true);
+			$s=str_repeat('1',255); //unset函数清理内存
+            unset($s); //unset函数清理内存
+		}
+	}
 
 	    public function exemptEntity(Entity $entity){
         $this->exemptedEntities[$entity->getID()] = $entity;
@@ -103,7 +113,7 @@ Server::getInstance()->broadcastMessage("[ PMcleaner ] 共清理{$i}个掉落物
         Server::getInstance()->broadcastMessage("[ PMcleaner] 共杀掉{$i}个生物，内存清理完成！");
     }
 	public function onTimer()
-    {
+    {//内存清理模块
 		foreach($this->getServer()->getLevels() as $level){
 			$level->doChunkGarbageCollection();
 			$level->unloadChunks(\true);

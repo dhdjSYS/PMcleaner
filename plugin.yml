@@ -1,9 +1,9 @@
 name: PMcleaner
 main: PMCleaner\Main
-version: 1.0.0
+version: 1.0.1
 api: [2.0.0]
 load: STARTUP
-author: dhdj
+author: Mr_DHDJ
 commands:
  clean:
   permission: PMCleaner.command.clean
